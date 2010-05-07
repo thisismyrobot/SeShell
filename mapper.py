@@ -1,8 +1,11 @@
+import re
+
+
 class CleverClass(object):
-    def do_stuff(self):
+    def do_stuff(self, data):
         """ Does "stuff" with data".
         """
-        print "doing clever stuff"
+        print "received", data
 
 
 class Mapper(object):
@@ -14,7 +17,12 @@ class Mapper(object):
     def parse(self, data):
         """ Parses argument(s) and calls methods as mapped.
         """
-        self.mapping[data]()
+        for expression,method in self.mapping.items():
+            arguments = re.findall(expression, data)
+            try:
+                method(*arguments)
+            except:
+                 pass
 
     def connect(self, input, method):
         """ Connects an input string to a method to be called.
@@ -23,5 +31,5 @@ class Mapper(object):
 
 
 mapper = Mapper()
-mapper.connect("beclever", CleverClass().do_stuff)
-mapper.parse("beclever")
+mapper.connect("beclever([0-9]*)", CleverClass().do_stuff)
+mapper.parse("beclever32")
