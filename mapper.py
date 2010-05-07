@@ -21,6 +21,7 @@ class Mapper(object):
             arguments = re.findall(expression, data)
             try:
                 method(*arguments)
+                break;
             except:
                  pass
 
