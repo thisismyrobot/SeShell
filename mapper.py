@@ -1,13 +1,6 @@
 import re
 
 
-class CleverClass(object):
-    def do_stuff(self, data):
-        """ Does "stuff" with data".
-        """
-        print "received", data
-
-
 class Mapper(object):
     """ Controls the mapping between serial commands and python methods.
     """
@@ -29,8 +22,3 @@ class Mapper(object):
         """ Connects an input string to a method to be called.
         """
         self.mapping[input] = method
-
-
-mapper = Mapper()
-mapper.connect("beclever([0-9]*)", CleverClass().do_stuff)
-mapper.parse("beclever32")
