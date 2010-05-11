@@ -47,7 +47,7 @@ handled: 'hello world'
 No handler
 ----------
 
-If no handler has been chosen, the mapping silently fails
+If no mapping has been defined for an input, the mapping silently fails
 
 >>> mapper_tool.parse("incorrectinput hello world")
 
@@ -91,7 +91,7 @@ And some xml to parse
 ...     </mapping>
 ...     <mapping>
 ...         <id>SecondHandler.multiply_data</id>
-...         <pattern>multiply\(([0-9])*,([0-9])*\)</pattern>
+...         <pattern>multiply\(([0-9]*),([0-9]*)\)</pattern>
 ...     </mapping>
 ...     <mapping>
 ...         <id>SecondHandler.just_say_hi</id>

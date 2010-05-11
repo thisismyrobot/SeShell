@@ -11,26 +11,23 @@ class Mapper(object):
 
     def _count_groups(self, regex):
         """ Counts the number of un-escaped '('s to determine the expected
-            number of arguments.
+            number of arguments. Each argument is surrounded by a () in the
+            regular expression.
         """
         return len(re.findall('(?<!\\\)(\\()', regex))
 
     def parse(self, data):
-        """ Parses argument(s) and calls methods as mapped.
+        """ Parses argument(s) and calls methods as mapped. The matching is
+            done with re.sub that replaces a match with ''. If the input data
+            exactly matches the result is ''.
         """
         for expression,id in self.expressions.items():
-            matched_groups = 0
-            arguments = None
-            matches = re.search(expression, data)
-            if matches:
-                arguments = matches.groups()
-                matched_groups = len(arguments)
-            if matched_groups == self._count_groups(expression) and id in self.callable_objects:
-                try:
+            if re.sub(expression, '', data) == '':
+                matches = re.search(expression, data)
+                if matches:
+                    arguments = matches.groups()
+                if len(arguments) == self._count_groups(expression) and id in self.callable_objects:
                     self.callable_objects[id](*arguments)
-                    break
-                except:
-                    pass
 
     def bind(self, id, regex=None, callable_object=None):
         """ Connects method ids to regular expressions and/or the actual
