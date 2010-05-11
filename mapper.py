@@ -28,7 +28,7 @@ class Mapper(object):
             if matched_groups == self._count_groups(expression) and id in self.callable_objects:
                 try:
                     self.callable_objects[id](*arguments)
-                    break;
+                    break
                 except:
                     pass
 
