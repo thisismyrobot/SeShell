@@ -86,16 +86,16 @@ And some xml to parse
 >>> xml = """<?xml version="1.0" encoding="UTF-8"?>
 ... <mappings>
 ...     <mapping>
-...         <pattern>printme (.*)</pattern>
 ...         <id>SecondHandler.print_data</id>
+...         <pattern>printme (.*)</pattern>
 ...     </mapping>
 ...     <mapping>
-...         <pattern>multiply\(([0-9])*,([0-9])*\)</pattern>
 ...         <id>SecondHandler.multiply_data</id>
+...         <pattern>multiply\(([0-9])*,([0-9])*\)</pattern>
 ...     </mapping>
 ...     <mapping>
-...         <pattern>noargs</pattern>
 ...         <id>SecondHandler.just_say_hi</id>
+...         <pattern>noargs</pattern>
 ...     </mapping>
 ... </mappings>
 ... """

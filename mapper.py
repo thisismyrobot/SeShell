@@ -9,20 +9,31 @@ class Mapper(object):
         self.expressions = {}
         self.callable_objects = {}
 
+    def _count_arguments(self, regex):
+        return len(re.findall('(?<!\\\)(\\()', regex))
+
     def parse(self, data):
         """ Parses argument(s) and calls methods as mapped.
         """
+        #for each regular expression
         for expression,id in self.expressions.items():
-            arguments = None
+
+            #a direct match with a method with no arguments
+            num_arguments = self._count_arguments(expression)
+            if num_arguments == 0 and data == expression and id in self.callable_objects:
+                self.callable_objects[id]()
+                break;
+
+            #a direct match with a method with no arguments
             matches = re.search(expression, data)
             if matches:
                 arguments = matches.groups()
-            if id in self.callable_objects:
-                try:
-                    self.callable_objects[id](*arguments)
-                    break;
-                except:
-                    pass
+                if len(arguments) == num_arguments and id in self.callable_objects:
+                    try:
+                        self.callable_objects[id](*arguments)
+                        break;
+                    except:
+                        pass
 
     def bind(self, id, regex=None, callable_object=None):
         """ Connects method ids to regular expressions and/or the actual
