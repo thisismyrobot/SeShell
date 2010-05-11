@@ -6,33 +6,31 @@ class Mapper(object):
     """ Controls the mapping between serial commands and python methods.
     """
     def __init__(self):
-        self.mapping = {}
-        self.allowed = {}
-
-    def allow(self, name, method):
-        """ Adds a method to the list of allowable methods. This puts the method
-            in scope and limits the possible methods for security.
-        """
-        self.allowed[name] = method
+        self.expressions = {}
+        self.callable_objects = {}
 
     def parse(self, data):
         """ Parses argument(s) and calls methods as mapped.
         """
-        for expression,method in self.mapping.items():
+        for expression,id in self.expressions.items():
             arguments = re.findall(expression, data)
-            if method in self.allowed:
+            if id in self.callable_objects:
                 try:
-                    self.allowed[method](*arguments)
+                    self.callable_objects[id](*arguments)
                     break;
                 except:
                      pass
 
-    def connect(self, input, method):
-        """ Connects an input string to a method to be called.
+    def bind(self, id, regex=None, callable_object=None):
+        """ Connects method ids to regular expressions and/or the actual
+            Python methods.
         """
-        self.mapping[input] = method
+        if regex:
+            self.expressions[regex] = id
+        if callable_object:
+            self.callable_objects[id] = callable_object
 
-    def connect_from_xml(self, xml_file):
+    def bind_from_xml(self, xml_file):
         """ Parses mappings from an xml file and creates them.
         """
         xml_data = xml_file.read()
@@ -40,9 +38,9 @@ class Mapper(object):
         mappings = []
         xml_context = xml_struct.xpathNewContext()
         patterns = xml_context.xpathEval('//mappings/mapping/pattern/text()')
-        handlers = xml_context.xpathEval('//mappings/mapping/handler/text()')
+        ids = xml_context.xpathEval('//mappings/mapping/id/text()')
 
         for index in range(len(patterns)):
             pattern = str(patterns[index])
-            handler = str(handlers[index])
-            self.connect(pattern, handler)
+            id = str(ids[index])
+            self.bind(id, regex=pattern)

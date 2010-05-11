@@ -31,19 +31,15 @@ Mapping
 
 We can now map input strings to that the handler
 
->>> mapper_tool.connect("printinput (.*)", "Handler.handle")
+>>> mapper_tool.bind(
+...     "Handler.handle",
+...     regex="printinput (.*)",
+...     callable_object=Handler.handle)
 
 Parsing
 -------
 
 The mapper tool parses inputs and runs methods as mapped.
-
->>> mapper_tool.parse("printinput hello world")
-
-This returns nothing as the method was not yet allowed. Allowing a method also
-adds it into scope for the mapper.
-
->>> mapper_tool.allow("Handler.handle", Handler.handle)
 
 >>> mapper_tool.parse("printinput hello world")
 handled: 'hello world'
@@ -79,22 +75,17 @@ And another handler
 ...         """
 ...         print int(numbers[0]) * int(numbers[1])
 
-We allow the handler methods
-
->>> mapper_tool.allow("SecondHandler.print_data", SecondHandler.print_data)
->>> mapper_tool.allow("SecondHandler.multiply_data", SecondHandler.multiply_data)
-
 And some xml to parse
 
 >>> xml = """<?xml version="1.0" encoding="UTF-8"?>
 ... <mappings>
 ...     <mapping>
 ...         <pattern>printme (.*)</pattern>
-...         <handler>SecondHandler.print_data</handler>
+...         <id>SecondHandler.print_data</id>
 ...     </mapping>
 ...     <mapping>
 ...         <pattern>multiply\(([0-9])*,([0-9])*\)</pattern>
-...         <handler>SecondHandler.multiply_data</handler>
+...         <id>SecondHandler.multiply_data</id>
 ...     </mapping>
 ... </mappings>
 ... """
@@ -103,11 +94,28 @@ We can now load the xml
 
 >>> import StringIO
 >>> xmlfile = StringIO.StringIO(xml)
->>> mapper_tool.connect_from_xml(xmlfile)
-
-Which is mapped into the mapper tool
+>>> mapper_tool.bind_from_xml(xmlfile)
 
 And try out the two mappings
+
+>>> mapper_tool.parse("printme hello")
+
+>>> mapper_tool.parse("multiply(6,2)")
+
+This returns nothing as the callable has not yet been bound - so it is not yet
+in scope. XML derived mappings need explicit binding as they cannot contain
+a reference to the callable object. This explicit binding also acts as a
+white-list of allowable commands.
+
+>>> mapper_tool.bind(
+...     "SecondHandler.print_data",
+...     callable_object=SecondHandler.print_data)
+
+>>> mapper_tool.bind(
+...     "SecondHandler.multiply_data",
+...     callable_object=SecondHandler.multiply_data)
+
+After allowing the methods, we can try out the two mappings again
 
 >>> mapper_tool.parse("printme hello")
 printing: 'hello'
