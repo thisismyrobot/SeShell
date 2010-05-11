@@ -70,10 +70,16 @@ And another handler
 ...         print "printing: '%s'" % data
 ...
 ...     @staticmethod
-...     def multiply_data(numbers):
+...     def multiply_data(number1, number2):
 ...         """ Prints the product of a dict of two numbers
 ...         """
-...         print int(numbers[0]) * int(numbers[1])
+...         print int(number1) * int(number2)
+...
+...     @staticmethod
+...     def just_say_hi():
+...         """ Prints 'hi'
+...         """
+...         print 'hi'
 
 And some xml to parse
 
@@ -86,6 +92,10 @@ And some xml to parse
 ...     <mapping>
 ...         <pattern>multiply\(([0-9])*,([0-9])*\)</pattern>
 ...         <id>SecondHandler.multiply_data</id>
+...     </mapping>
+...     <mapping>
+...         <pattern>noargs</pattern>
+...         <id>SecondHandler.just_say_hi</id>
 ...     </mapping>
 ... </mappings>
 ... """
@@ -102,6 +112,8 @@ And try out the two mappings
 
 >>> mapper_tool.parse("multiply(6,2)")
 
+>>> mapper_tool.parse("noargs")
+
 This returns nothing as the callable has not yet been bound - so it is not yet
 in scope. XML derived mappings need explicit binding as they cannot contain
 a reference to the callable object. This explicit binding also acts as a
@@ -115,6 +127,10 @@ white-list of allowable commands.
 ...     "SecondHandler.multiply_data",
 ...     callable_object=SecondHandler.multiply_data)
 
+>>> mapper_tool.bind(
+...     "SecondHandler.just_say_hi",
+...     callable_object=SecondHandler.just_say_hi)
+
 After allowing the methods, we can try out the two mappings again
 
 >>> mapper_tool.parse("printme hello")
@@ -122,3 +138,6 @@ printing: 'hello'
 
 >>> mapper_tool.parse("multiply(6,2)")
 12
+
+>>> mapper_tool.parse("noargs")
+hi

@@ -13,13 +13,16 @@ class Mapper(object):
         """ Parses argument(s) and calls methods as mapped.
         """
         for expression,id in self.expressions.items():
-            arguments = re.findall(expression, data)
+            arguments = None
+            matches = re.search(expression, data)
+            if matches:
+                arguments = matches.groups()
             if id in self.callable_objects:
                 try:
                     self.callable_objects[id](*arguments)
                     break;
                 except:
-                     pass
+                    pass
 
     def bind(self, id, regex=None, callable_object=None):
         """ Connects method ids to regular expressions and/or the actual
