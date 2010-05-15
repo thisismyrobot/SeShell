@@ -3,7 +3,7 @@ import libxml2
 
 
 class Mapper(object):
-    """ Controls the mapping between serial commands and python methods.
+    """ Maps string commands to Python methods
     """
     def __init__(self):
         self.expressions = {}
@@ -12,7 +12,7 @@ class Mapper(object):
     def parse(self, data):
         """ Parses argument(s) and calls methods as mapped. The matching is
             done with re.sub that replaces a match with ''. If the input data
-            exactly matches the result is ''.
+            exactly matches, the result is ''.
         """
         for expression,id in self.expressions.items():
             if re.sub(expression, '', data) == '':
