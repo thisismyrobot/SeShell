@@ -2,7 +2,7 @@ import re
 import libxml2
 
 
-class Mapper(object):
+class Probie(object):
     """ Maps string commands to Python methods
     """
     def __init__(self):
