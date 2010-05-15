@@ -10,4 +10,5 @@ setup(name='Probie',
       maintainer='Robert Wallhead',
       maintainer_email='rwallhead@gmail.com',
       long_description='Probie acts as a protocol bridge, mapping string commands to Python methods.',
+      url='http://thisismyrobot.blogspot.com',
      )
