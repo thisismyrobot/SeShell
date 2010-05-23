@@ -1,47 +1,83 @@
-import re
+import os
 import libxml2
+import re
+import subprocess
+
+
+class Argument(object):
+    """ Holds an argument for a command.
+    """
+    def __init__(self, arg_type, arg_val):
+        self.arg_type = arg_type
+        self.arg_val = arg_val
+
+    def get(self):
+        return (self.arg_type, self.arg_val)
+
+class Mapping(object):
+    """ Holds a mapping between a serial command and a shell command.
+    """
+    def __init__(self, pattern, command):
+        self.pattern = str(pattern)
+        self.command = str(command)
+        self._arguments = []
+
+    def add_argument(self, arg_type, arg_val):
+        self._arguments.append(Argument(arg_type, arg_val))
+
+    @property
+    def arguments(self):
+        return [arg.get() for arg in self._arguments]
 
 
 class SeShell(object):
     """ Maps serial commands to shell commands.
     """
     def __init__(self):
-        self.expressions = {}
-        self.callable_objects = {}
+        self.mappings = []
 
     def parse(self, data):
         """ Parses argument(s) and calls methods as mapped. The matching is
             done with re.sub that replaces a match with ''. If the input data
-            exactly matches, the result is ''.
+            exactly matches, the result is ''. The result is returned.
         """
-        for expression,id in self.expressions.items():
-            if re.sub(expression, '', data) == '':
-                matches = re.search(expression, data)
+        for mapping in self.mappings:
+            pattern = mapping.pattern
+            if re.sub(pattern, '', data) == '':
+                matches = re.search(pattern, data)
                 if matches:
-                    arguments = matches.groups()
-                if id in self.callable_objects:
-                    self.callable_objects[id](*arguments)
+                    input_arguments = matches.groups()
+                    input_arguments_index = 0
+                    command = mapping.command
+                    shell_command = [command]
+                    for argument in mapping.arguments:
+                        if argument[0] == 'static':
+                            shell_command.append(argument[1])
+                        else:
+                            shell_command.append(input_arguments[input_arguments_index])
+                            input_arguments_index += 1
+                    proc = subprocess.Popen(shell_command, stdout=subprocess.PIPE)
+                    return proc.stdout.readline().rstrip()
 
-    def bind(self, id, regex=None, callable_object=None):
-        """ Connects method ids to regular expressions and/or the actual
-            Python methods.
-        """
-        if regex:
-            self.expressions[regex] = id
-        if callable_object:
-            self.callable_objects[id] = callable_object
-
-    def bind_from_xml(self, xml_file):
-        """ Parses mappings from an xml file and creates them.
+    def load(self, xml_file):
+        """ Parses an xml file into memory.
         """
         xml_data = xml_file.read()
         xml_struct = libxml2.parseMemory(xml_data, len(xml_data))
-        mappings = []
         xml_context = xml_struct.xpathNewContext()
-        patterns = xml_context.xpathEval('//mappings/mapping/pattern/text()')
-        ids = xml_context.xpathEval('//mappings/mapping/id/text()')
 
-        for index in range(len(patterns)):
-            pattern = str(patterns[index])
-            id = str(ids[index])
-            self.bind(id, regex=pattern)
+        mappings = xml_context.xpathEval('//mappings/mapping')
+        for mapping in mappings:
+            pattern = mapping.xpathEval('pattern/text()')[0]
+            command = mapping.xpathEval('command/text()')[0]
+            mapping_instance = Mapping(pattern, command)
+            arguments = mapping.xpathEval('arguments/argument')
+            for argument in arguments:
+                arg_type = argument.xpathEval('@type')[0].content
+                arg_val = argument.content
+                mapping_instance.add_argument(arg_type, arg_val)
+            self.mappings.append(mapping_instance)
+
+        xml_struct.freeDoc()
+        xml_context.xpathFreeContext()
+        xml_file.close()
