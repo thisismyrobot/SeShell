@@ -4,15 +4,20 @@ import re
 import subprocess
 
 
+class Argument(object):
+    """ Represents an argument.
+    """
+    def __init__(self, static, value):
+        self.static = static
+        self.value = value
+
+
 class Mapping(object):
     """ Represents a mapping between a serial command and a shell command.
     """
     def __init__(self, pattern):
         self.pattern = str(pattern)
         self.arguments = []
-
-    def add_argument(self, arg_type, arg_val):
-        self.arguments.append((arg_type, arg_val))
 
 
 class SeShell(object):
@@ -33,8 +38,8 @@ class SeShell(object):
                 input_args_index = 0
                 output_args = []
                 for argument in mapping.arguments:
-                    if argument[0] == 'static':
-                        output_args.append(argument[1])
+                    if argument.static:
+                        output_args.append(argument.value)
                     else:
                         output_args.append(input_args[input_args_index])
                         input_args_index += 1
@@ -53,9 +58,9 @@ class SeShell(object):
             arguments = mapping.xpathEval('argument')
             mapping_instance = Mapping(pattern)
             for argument in arguments:
-                arg_type = argument.xpathEval('@type')[0].content
-                arg_val = argument.content
-                mapping_instance.add_argument(arg_type, arg_val)
+                static = (argument.xpathEval('@type')[0].content == 'static')
+                value = argument.content
+                mapping_instance.arguments.append(Argument(static, value))
             self.mappings.append(mapping_instance)
         xml_doc.freeDoc()
         xml_context.xpathFreeContext()
