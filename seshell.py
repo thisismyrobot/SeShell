@@ -26,6 +26,12 @@ class SeShell(object):
     def __init__(self):
         self.mappings = []
 
+    def _run(self, args):
+        """ Launches a process and returns the resultant string.
+        """
+        proc = subprocess.Popen(args, stdout=subprocess.PIPE)
+        return proc.stdout.readline().rstrip()
+
     def parse(self, data):
         """ Parses argument(s) and calls commands as mapped. The matching is
             done with re.sub that replaces a match with ''. If the input data
@@ -43,8 +49,7 @@ class SeShell(object):
                     else:
                         output_args.append(input_args[input_args_index])
                         input_args_index += 1
-                proc = subprocess.Popen(output_args, stdout=subprocess.PIPE)
-                return proc.stdout.readline().rstrip()
+                self._run(args)
 
     def load(self, xml_file):
         """ Parses an xml file into memory.
