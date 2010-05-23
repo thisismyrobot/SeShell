@@ -2,6 +2,7 @@ import os
 import libxml2
 import re
 import subprocess
+import threading
 
 
 class Argument(object):
@@ -26,11 +27,18 @@ class SeShell(object):
     def __init__(self):
         self.mappings = []
 
-    def _run(self, args):
+    def _print(self, data):
+        """ Prints the data. Is used as a callback for methods to make them
+            non-blocking. This will eventually fire data down a serial line.
+        """
+        print data
+
+    def _run(self, args, callback):
         """ Launches a process and returns the resultant string.
         """
         proc = subprocess.Popen(args, stdout=subprocess.PIPE)
-        return proc.stdout.readline().rstrip()
+        data = proc.stdout.readline().rstrip()
+        callback(data)
 
     def parse(self, data):
         """ Parses argument(s) and calls commands as mapped. The matching is
@@ -49,7 +57,7 @@ class SeShell(object):
                     else:
                         output_args.append(input_args[input_args_index])
                         input_args_index += 1
-                return self._run(output_args)
+                threading.Thread(target=self._run, args=(output_args, self._print)).start()
 
     def load(self, xml_file):
         """ Parses an xml file into memory.
