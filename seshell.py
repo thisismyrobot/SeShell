@@ -4,32 +4,15 @@ import re
 import subprocess
 
 
-class Argument(object):
-    """ Represents an argument for a command.
-    """
-    def __init__(self, arg_type, arg_val):
-        self.arg_type = arg_type
-        self.arg_val = arg_val
-
-    def get(self):
-        return (self.arg_type, self.arg_val)
-
-
 class Mapping(object):
     """ Represents a mapping between a serial command and a shell command.
     """
     def __init__(self, pattern):
         self.pattern = str(pattern)
-        self._arguments = []
+        self.arguments = []
 
     def add_argument(self, arg_type, arg_val):
-        self._arguments.append(Argument(arg_type, arg_val))
-
-    @property
-    def arguments(self):
-        """ Returns a tuple of arguments (type, value).
-        """
-        return [arg.get() for arg in self._arguments]
+        self.arguments.append((arg_type, arg_val))
 
 
 class SeShell(object):
