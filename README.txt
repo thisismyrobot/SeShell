@@ -28,21 +28,17 @@ And some xml to parse
 ... <mappings>
 ...     <mapping>
 ...         <pattern>test1 (.*)</pattern>
-...         <command>python</command>
-...         <arguments>
-...             <argument type="static">test/printargs.py</argument>
-...             <argument type="dynamic">0</argument>
-...         </arguments>
+...         <argument type="static">python</argument>
+...         <argument type="static">test/printargs.py</argument>
+...         <argument type="dynamic">0</argument>
 ...     </mapping>
 ...     <mapping>
 ...         <pattern>test2 (.*),(.*)</pattern>
-...         <command>python</command>
-...         <arguments>
-...             <argument type="static">test/printargs.py</argument>
-...             <argument type="dynamic">0</argument>
-...             <argument type="dynamic">1</argument>
-...             <argument type="static">last_argument</argument>
-...         </arguments>
+...         <argument type="static">python</argument>
+...         <argument type="static">test/printargs.py</argument>
+...         <argument type="dynamic">0</argument>
+...         <argument type="dynamic">1</argument>
+...         <argument type="static">last_argument</argument>
 ...     </mapping>
 ... </mappings>
 ... """

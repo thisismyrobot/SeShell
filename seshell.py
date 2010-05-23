@@ -18,9 +18,8 @@ class Argument(object):
 class Mapping(object):
     """ Represents a mapping between a serial command and a shell command.
     """
-    def __init__(self, pattern, command):
+    def __init__(self, pattern):
         self.pattern = str(pattern)
-        self.command = str(command)
         self._arguments = []
 
     def add_argument(self, arg_type, arg_val):
@@ -49,16 +48,16 @@ class SeShell(object):
             if re.sub(pattern, '', data) == '':
                 matches = re.search(pattern, data)
                 if matches:
-                    input_arguments = matches.groups()
-                    input_arguments_index = 0
-                    shell_command = [mapping.command]
+                    input_args = matches.groups()
+                    input_args_index = 0
+                    output_args = []
                     for argument in mapping.arguments:
                         if argument[0] == 'static':
-                            shell_command.append(argument[1])
+                            output_args.append(argument[1])
                         else:
-                            shell_command.append(input_arguments[input_arguments_index])
-                            input_arguments_index += 1
-                    proc = subprocess.Popen(shell_command, stdout=subprocess.PIPE)
+                            output_args.append(input_args[input_args_index])
+                            input_args_index += 1
+                    proc = subprocess.Popen(output_args, stdout=subprocess.PIPE)
                     return proc.stdout.readline().rstrip()
 
     def load(self, xml_file):
@@ -67,19 +66,16 @@ class SeShell(object):
         xml_data = xml_file.read()
         xml_doc = libxml2.parseMemory(xml_data, len(xml_data))
         xml_context = xml_doc.xpathNewContext()
-
         mappings = xml_context.xpathEval('//mappings/mapping')
         for mapping in mappings:
             pattern = mapping.xpathEval('pattern/text()')[0]
-            command = mapping.xpathEval('command/text()')[0]
-            mapping_instance = Mapping(pattern, command)
-            arguments = mapping.xpathEval('arguments/argument')
+            arguments = mapping.xpathEval('argument')
+            mapping_instance = Mapping(pattern)
             for argument in arguments:
                 arg_type = argument.xpathEval('@type')[0].content
                 arg_val = argument.content
                 mapping_instance.add_argument(arg_type, arg_val)
             self.mappings.append(mapping_instance)
-
         xml_doc.freeDoc()
         xml_context.xpathFreeContext()
         xml_file.close()
