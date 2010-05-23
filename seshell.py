@@ -49,7 +49,7 @@ class SeShell(object):
                     else:
                         output_args.append(input_args[input_args_index])
                         input_args_index += 1
-                self._run(args)
+                return self._run(output_args)
 
     def load(self, xml_file):
         """ Parses an xml file into memory.
