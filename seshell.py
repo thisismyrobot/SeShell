@@ -2,8 +2,8 @@ import re
 import libxml2
 
 
-class Probie(object):
-    """ Maps string commands to Python methods
+class SeShell(object):
+    """ Maps serial commands to shell commands.
     """
     def __init__(self):
         self.expressions = {}
