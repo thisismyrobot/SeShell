@@ -29,19 +29,17 @@ class SeShell(object):
         for mapping in self.mappings:
             pattern = mapping.pattern
             if re.sub(pattern, '', data) == '':
-                matches = re.search(pattern, data)
-                if matches:
-                    input_args = matches.groups()
-                    input_args_index = 0
-                    output_args = []
-                    for argument in mapping.arguments:
-                        if argument[0] == 'static':
-                            output_args.append(argument[1])
-                        else:
-                            output_args.append(input_args[input_args_index])
-                            input_args_index += 1
-                    proc = subprocess.Popen(output_args, stdout=subprocess.PIPE)
-                    return proc.stdout.readline().rstrip()
+                input_args = re.search(pattern, data).groups()
+                input_args_index = 0
+                output_args = []
+                for argument in mapping.arguments:
+                    if argument[0] == 'static':
+                        output_args.append(argument[1])
+                    else:
+                        output_args.append(input_args[input_args_index])
+                        input_args_index += 1
+                proc = subprocess.Popen(output_args, stdout=subprocess.PIPE)
+                return proc.stdout.readline().rstrip()
 
     def load(self, xml_file):
         """ Parses an xml file into memory.
