@@ -5,7 +5,7 @@ import subprocess
 
 
 class Argument(object):
-    """ Holds an argument for a command.
+    """ Represents an argument for a command.
     """
     def __init__(self, arg_type, arg_val):
         self.arg_type = arg_type
@@ -14,8 +14,9 @@ class Argument(object):
     def get(self):
         return (self.arg_type, self.arg_val)
 
+
 class Mapping(object):
-    """ Holds a mapping between a serial command and a shell command.
+    """ Represents a mapping between a serial command and a shell command.
     """
     def __init__(self, pattern, command):
         self.pattern = str(pattern)
@@ -27,6 +28,8 @@ class Mapping(object):
 
     @property
     def arguments(self):
+        """ Returns a tuple of arguments (type, value).
+        """
         return [arg.get() for arg in self._arguments]
 
 
@@ -48,8 +51,7 @@ class SeShell(object):
                 if matches:
                     input_arguments = matches.groups()
                     input_arguments_index = 0
-                    command = mapping.command
-                    shell_command = [command]
+                    shell_command = [mapping.command]
                     for argument in mapping.arguments:
                         if argument[0] == 'static':
                             shell_command.append(argument[1])
@@ -63,8 +65,8 @@ class SeShell(object):
         """ Parses an xml file into memory.
         """
         xml_data = xml_file.read()
-        xml_struct = libxml2.parseMemory(xml_data, len(xml_data))
-        xml_context = xml_struct.xpathNewContext()
+        xml_doc = libxml2.parseMemory(xml_data, len(xml_data))
+        xml_context = xml_doc.xpathNewContext()
 
         mappings = xml_context.xpathEval('//mappings/mapping')
         for mapping in mappings:
@@ -78,6 +80,6 @@ class SeShell(object):
                 mapping_instance.add_argument(arg_type, arg_val)
             self.mappings.append(mapping_instance)
 
-        xml_struct.freeDoc()
+        xml_doc.freeDoc()
         xml_context.xpathFreeContext()
         xml_file.close()
