@@ -39,7 +39,7 @@ class SeShell(object):
         self.mappings = []
 
     def parse(self, data):
-        """ Parses argument(s) and calls methods as mapped. The matching is
+        """ Parses argument(s) and calls commands as mapped. The matching is
             done with re.sub that replaces a match with ''. If the input data
             exactly matches, the result is ''. The result is returned.
         """
