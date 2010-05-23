@@ -53,6 +53,9 @@ We can now load the xml
 >>> xmlfile = StringIO.StringIO(xml)
 >>> seshell_tool.load(xmlfile)
 
+Parsing input
+-------------
+
 And try out the two mappings. The test script prints the arguments to stdout
 and the parse method returns that output as a string.
 
@@ -61,3 +64,10 @@ and the parse method returns that output as a string.
 
 >>> seshell_tool.parse("test2 6,2")
 "arguments: ['test/printargs.py', '6', '2', 'last_argument']"
+
+Incorrect input
+---------------
+
+Incorrect (non-mapped) input is ignored
+
+>>> seshell_tool.parse("test3 nonexistent")
