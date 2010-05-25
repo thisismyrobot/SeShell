@@ -95,3 +95,12 @@ really slow embedded systems.
 
 >>> time.sleep(3)
 delayed arguments: ['test/slowprocess.py', '34', '26']
+
+Escaped arguments
+-----------------
+
+To stop arguments breaking out of the method call, they are escaped.
+
+>>> seshell_tool.parse("""test1 hello ; echo \"b,oo\\' "bar'""")
+>>> time.sleep(0.1)
+arguments: ['test/printargs.py', 'hello ; echo "b,oo\\\' "bar\'']
