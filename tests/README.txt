@@ -24,13 +24,13 @@ And some xml to parse
 ...     <mapping>
 ...         <pattern>test1 (.*)</pattern>
 ...         <argument type="static">python</argument>
-...         <argument type="static">tests/printargs.py</argument>
+...         <argument type="static">tests/processes/printargs.py</argument>
 ...         <argument type="dynamic">0</argument>
 ...     </mapping>
 ...     <mapping>
 ...         <pattern>test2 (.*),(.*)</pattern>
 ...         <argument type="static">python</argument>
-...         <argument type="static">tests/printargs.py</argument>
+...         <argument type="static">tests/processes/printargs.py</argument>
 ...         <argument type="dynamic">0</argument>
 ...         <argument type="dynamic">1</argument>
 ...         <argument type="static">last_argument</argument>
@@ -38,7 +38,7 @@ And some xml to parse
 ...     <mapping>
 ...         <pattern>test3 (.*),(.*)</pattern>
 ...         <argument type="static">python</argument>
-...         <argument type="static">tests/slowprocess.py</argument>
+...         <argument type="static">tests/processes/slowprocess.py</argument>
 ...         <argument type="dynamic">0</argument>
 ...         <argument type="dynamic">1</argument>
 ...     </mapping>
@@ -61,11 +61,11 @@ command as the processes are non-blocking.
 >>> import time
 >>> seshell_tool.parse("test1 hello")
 >>> time.sleep(0.1)
-arguments: ['tests/printargs.py', 'hello']
+arguments: ['tests/processes/printargs.py', 'hello']
 
 >>> seshell_tool.parse("test2 6,2")
 >>> time.sleep(0.1)
-arguments: ['tests/printargs.py', '6', '2', 'last_argument']
+arguments: ['tests/processes/printargs.py', '6', '2', 'last_argument']
 
 Incorrect input
 ---------------
@@ -89,7 +89,7 @@ really slow embedded systems.
 0
 
 >>> time.sleep(3)
-delayed arguments: ['tests/slowprocess.py', '34', '26']
+delayed arguments: ['tests/processes/slowprocess.py', '34', '26']
 
 Escaped arguments
 -----------------
@@ -98,4 +98,4 @@ To stop arguments breaking out of the method call, they are escaped.
 
 >>> seshell_tool.parse("""test1 hello ; echo \"b,oo\\' "bar'""")
 >>> time.sleep(0.1)
-arguments: ['tests/printargs.py', 'hello ; echo "b,oo\\\' "bar\'']
+arguments: ['tests/processes/printargs.py', 'hello ; echo "b,oo\\\' "bar\'']
