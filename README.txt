@@ -11,4 +11,9 @@ Running SeShell
 ===============
 
 It doesn't run in it's own right, yet, but if you want to see what it can do,
-then run the tests in Python 2.6 with "python runtests.py"
+then read tests/README.txt
+
+Tests
+=====
+
+Are runnable in Python 2.6 with the command "python runtests.py"
