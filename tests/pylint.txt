@@ -16,7 +16,9 @@ Once installed, we can import it
 Or we can run it from the command line
 
 >>> import subprocess
->>> proc = subprocess.Popen(['pylint'], stdout=subprocess.PIPE)
+>>> proc = subprocess.Popen(['pylint'],
+...                         stdout=subprocess.PIPE,
+...                         stderr=subprocess.PIPE)
 >>> print proc.stdout.readline().strip()
 Usage:  pylint [options] module_or_package
 
@@ -25,7 +27,10 @@ Code quality
 
 Now we can verify that our code is high-quality
 
->>> proc = subprocess.Popen(['pylint seshell.py'], stdout=subprocess.PIPE)
->>> print proc.stdout.read()
-Usage:  pylint [options] module_or_package
-
+>>> proc = subprocess.Popen(['pylint', 'seshell.py'],
+...                         stdout=subprocess.PIPE,
+...                         stderr=subprocess.PIPE)
+>>> print proc.stdout.read().strip()
+Report
+...
+Your code has been rated at 10.00/10...

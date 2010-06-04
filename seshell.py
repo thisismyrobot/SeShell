@@ -10,16 +10,40 @@ class Argument(object):
     """ Represents an argument.
     """
     def __init__(self, static, value):
-        self.static = static
-        self.value = value
+        self._static = static
+        self._value = value
+
+    @property
+    def static(self):
+        """ Returns whether the argument is static
+        """
+        return self._static
+
+    @property
+    def value(self):
+        """ Returns the argument value
+        """
+        return self._value
 
 
 class Mapping(object):
     """ Represents a mapping between a serial command and a shell command.
     """
     def __init__(self, pattern):
-        self.pattern = str(pattern)
-        self.arguments = []
+        self._pattern = str(pattern)
+        self._args = []
+
+    @property
+    def pattern(self):
+        """ Returns the mapping pattern.
+        """
+        return self._pattern
+
+    @property
+    def arguments(self):
+        """ Returns the arguments for the mapping.
+        """
+        return self._args
 
 
 class SeShell(object):
