@@ -1,0 +1,10 @@
+=======
+ TODOs
+=======
+
+Planned features/ideas - a very informal road-map.
+
+ * Validate XML against a DTD - then don't have to have as much error checking
+   in the code-base.
+ * Consider MIM on UART to allow for "yes, I'm a device" so could scan serial
+   ports to find.
