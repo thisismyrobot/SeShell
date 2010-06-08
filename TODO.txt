@@ -8,3 +8,4 @@ Planned features/ideas - a very informal road-map.
    in the code-base.
  * Consider MIM on UART to allow for "yes, I'm a device" so could scan serial
    ports to find.
+ * Define return strings for raised exceptions in xml.
