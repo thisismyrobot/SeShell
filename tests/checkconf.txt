@@ -76,6 +76,9 @@ This error is thrown by the DTD validator
 >>> print proc.stderr.read().strip()
 No declaration for element wrongroot
 
+>>> len(proc.stdout.read().strip())
+0
+
 No mappings
 -----------
 
@@ -86,3 +89,6 @@ This error is thrown by the DTD validator
 ...                         stderr=subprocess.PIPE)
 >>> print proc.stderr.read().strip()
 Element mappings content does not follow the DTD, expecting (mapping)+, got ()
+
+>>> len(proc.stdout.read().strip())
+0
