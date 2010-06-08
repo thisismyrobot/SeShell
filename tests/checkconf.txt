@@ -1,0 +1,83 @@
+================
+ Config checker
+================
+
+checkconf.py checks the validity of an xml file. Here we test it works. To
+validate a config, the user just runs ./checkconf.py [xmlfilename].
+
+No file
+-------
+
+The config checker needs to be passed a file
+
+>>> import subprocess
+>>> proc = subprocess.Popen(['python', 'checkconf.py'],
+...                         stdout=subprocess.PIPE,
+...                         stderr=subprocess.PIPE)
+>>> print proc.stderr.read().strip()
+Traceback (most recent call last):
+...
+IndexError: list index out of range
+
+Missing file
+------------
+
+We need to check that the file doesn't actually exists first.
+
+>>> import os
+>>> os.path.exists('tests/configs/nonexistent.xml')
+False
+
+Now we can pass the nonexistent file path to the config checker
+
+>>> proc = subprocess.Popen(['python', 'checkconf.py', 'tests/configs/nonexistent.xml'],
+...                         stdout=subprocess.PIPE,
+...                         stderr=subprocess.PIPE)
+>>> print proc.stderr.read().strip()
+Traceback (most recent call last):
+...
+IOError: [Errno 2] No such file or directory: 'tests/configs/nonexistent.xml'
+
+Empty file
+----------
+
+>>> proc = subprocess.Popen(['python', 'checkconf.py', 'tests/configs/empty.xml'],
+...                         stdout=subprocess.PIPE,
+...                         stderr=subprocess.PIPE)
+>>> print proc.stderr.read().strip()
+Traceback (most recent call last):
+...
+libxml2.parserError: xmlParseMemory() failed
+
+No root
+-------
+
+>>> proc = subprocess.Popen(['python', 'checkconf.py', 'tests/configs/no_root.xml'],
+...                         stdout=subprocess.PIPE,
+...                         stderr=subprocess.PIPE)
+>>> print proc.stderr.read().strip()
+Entity: line 2: parser error : Start tag expected, '<' not found
+...
+libxml2.parserError: xmlParseMemory() failed
+
+Wrong root
+----------
+
+This error is thrown by the DTD validator
+
+>>> proc = subprocess.Popen(['python', 'checkconf.py', 'tests/configs/wrong_root.xml'],
+...                         stdout=subprocess.PIPE,
+...                         stderr=subprocess.PIPE)
+>>> print proc.stderr.read().strip()
+No declaration for element wrongroot
+
+No mappings
+-----------
+
+This error is thrown by the DTD validator
+
+>>> proc = subprocess.Popen(['python', 'checkconf.py', 'tests/configs/no_mappings.xml'],
+...                         stdout=subprocess.PIPE,
+...                         stderr=subprocess.PIPE)
+>>> print proc.stderr.read().strip()
+Element mappings content does not follow the DTD, expecting (mapping)+, got ()
