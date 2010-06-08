@@ -1,0 +1,7 @@
+<!ELEMENT mappings (mapping+)>
+<!ELEMENT mapping (pattern, argument+)>
+<!ELEMENT pattern (#PCDATA)>
+<!ELEMENT argument (#PCDATA)>
+<!ATTLIST argument
+    type    (static|dynamic)    #REQUIRED
+>
