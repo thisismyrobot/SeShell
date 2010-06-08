@@ -16,4 +16,4 @@ then read tests/README.txt
 Tests
 =====
 
-Are runnable in Python 2.6 with the command "python runtests.py"
+Are runnable in Python 2.6 with the command "./runtests.py"
