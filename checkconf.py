@@ -10,6 +10,14 @@ import libxml2
 import sys
 
 
+def error(error_detail):
+    """ Prints out an error to stderr.
+    """
+    error_string = "CheckConf Error: %s" % (error_detail,)
+    sys.stderr.write(error_string)
+    sys.exit(2)
+
+
 def validate():
     """ Returns None if the xml config is valid, prints a list of validation
         errors otherwise.
@@ -17,25 +25,26 @@ def validate():
     try:
         xml_file = file(sys.argv[1])
     except IndexError:
-        print "Error: Missing path to config file as argument."
-        return
+        error("Missing path to XML configuration file as argument.")
     except IOError:
-        print "Error: Couldn't load file '%s', check it " % (sys.argv[1],) + \
-              "exists and is able to be opened."
-        return
+        error("Couldn't load file '%s', check it exists and is able to be "
+              "opened." % (sys.argv[1],))
 
     xml_data = xml_file.read()
 
     try:
         xml_doc = libxml2.parseMemory(xml_data, len(xml_data))
     except libxml2.parserError:
-        print "Error: Could not parse '%s', check it " % (sys.argv[1],) + \
-              "contains valid configuration xml."
+        error("Could not parse '%s', check it contains valid XML "
+              "configuration." % (sys.argv[1],))
         return
 
     xml_context = xml_doc.xpathNewContext()
     dtd = libxml2.parseDTD(None, 'validxml.dtd')
-    xml_doc.validateDtd(xml_context, dtd)
+    ret = xml_doc.validateDtd(xml_context, dtd)
+
+    if ret == 0:
+        error("XML in '%s' not valid, see error(s) above." % (sys.argv[1],))
 
     dtd.freeDtd()
     xml_doc.freeDoc()

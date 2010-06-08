@@ -14,11 +14,11 @@ The config checker needs to be passed a file
 >>> proc = subprocess.Popen(['python', 'checkconf.py'],
 ...                         stdout=subprocess.PIPE,
 ...                         stderr=subprocess.PIPE)
->>> len(proc.stderr.read().strip())
+>>> len(proc.stdout.read().strip())
 0
 
->>> print proc.stdout.read().strip()
-Error: Missing path to config file as argument.
+>>> print proc.stderr.read().strip()
+CheckConf Error: Missing path to XML configuration file as argument.
 
 Missing file
 ------------
@@ -34,11 +34,11 @@ Now we can pass the nonexistent file path to the config checker
 >>> proc = subprocess.Popen(['python', 'checkconf.py', 'tests/configs/nonexistent.xml'],
 ...                         stdout=subprocess.PIPE,
 ...                         stderr=subprocess.PIPE)
->>> len(proc.stderr.read().strip())
+>>> len(proc.stdout.read().strip())
 0
 
->>> print proc.stdout.read().strip()
-Error: Couldn't load file 'tests/configs/nonexistent.xml', check it exists and is able to be opened.
+>>> print proc.stderr.read().strip()
+CheckConf Error: Couldn't load file 'tests/configs/nonexistent.xml', check it exists and is able to be opened.
 
 Empty file
 ----------
@@ -46,11 +46,11 @@ Empty file
 >>> proc = subprocess.Popen(['python', 'checkconf.py', 'tests/configs/empty.xml'],
 ...                         stdout=subprocess.PIPE,
 ...                         stderr=subprocess.PIPE)
->>> len(proc.stderr.read().strip())
+>>> len(proc.stdout.read().strip())
 0
 
->>> print proc.stdout.read().strip()
-Error: Could not parse 'tests/configs/empty.xml', check it contains valid configuration xml.
+>>> print proc.stderr.read().strip()
+CheckConf Error: Could not parse 'tests/configs/empty.xml', check it contains valid XML configuration.
 
 No root
 -------
@@ -58,12 +58,13 @@ No root
 >>> proc = subprocess.Popen(['python', 'checkconf.py', 'tests/configs/no_root.xml'],
 ...                         stdout=subprocess.PIPE,
 ...                         stderr=subprocess.PIPE)
+>>> len(proc.stdout.read().strip())
+0
+
 >>> print proc.stderr.read().strip()
 Entity: line 2: parser error : Start tag expected, '<' not found
 ...
-
->>> print proc.stdout.read().strip()
-Error: Could not parse 'tests/configs/no_root.xml', check it contains valid configuration xml.
+CheckConf Error: Could not parse 'tests/configs/no_root.xml', check it contains valid XML configuration.
 
 Wrong root
 ----------
@@ -75,6 +76,7 @@ This error is thrown by the DTD validator
 ...                         stderr=subprocess.PIPE)
 >>> print proc.stderr.read().strip()
 No declaration for element wrongroot
+CheckConf Error: XML in 'tests/configs/wrong_root.xml' not valid, see error(s) above.
 
 >>> len(proc.stdout.read().strip())
 0
@@ -89,6 +91,7 @@ This error is thrown by the DTD validator
 ...                         stderr=subprocess.PIPE)
 >>> print proc.stderr.read().strip()
 Element mappings content does not follow the DTD, expecting (mapping)+, got ()
+CheckConf Error: XML in 'tests/configs/no_mappings.xml' not valid, see error(s) above.
 
 >>> len(proc.stdout.read().strip())
 0
