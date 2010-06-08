@@ -14,9 +14,25 @@ def validate():
     """ Returns None if the xml config is valid, prints a list of validation
         errors otherwise.
     """
-    xml_file = file(sys.argv[1])
+    try:
+        xml_file = file(sys.argv[1])
+    except IndexError:
+        print "Error: Missing path to config file as argument."
+        return
+    except IOError:
+        print "Error: Couldn't load file '%s', check it " % (sys.argv[1],) + \
+              "exists and is able to be opened."
+        return
+
     xml_data = xml_file.read()
-    xml_doc = libxml2.parseMemory(xml_data, len(xml_data))
+
+    try:
+        xml_doc = libxml2.parseMemory(xml_data, len(xml_data))
+    except libxml2.parserError:
+        print "Error: Could not parse '%s', check it " % (sys.argv[1],) + \
+              "contains valid configuration xml."
+        return
+
     xml_context = xml_doc.xpathNewContext()
     dtd = libxml2.parseDTD(None, 'validxml.dtd')
     xml_doc.validateDtd(xml_context, dtd)
