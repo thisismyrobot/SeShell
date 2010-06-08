@@ -9,3 +9,6 @@ Planned features/ideas - a very informal road-map.
  * Consider MIM on UART to allow for "yes, I'm a device" so could scan serial
    ports to find.
  * Define return strings for raised exceptions in xml.
+ * Have an apache-like "./seashell.py checkconfig" to check the config file to
+   highlight errors - then don't have to worry about handling the error at
+   runtime
