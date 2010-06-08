@@ -1,3 +1,11 @@
+#!/usr/bin/python2.6
+
+"""
+
+SeShell testrunner
+
+"""
+
 import doctest
 
 
