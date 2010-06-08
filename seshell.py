@@ -45,6 +45,11 @@ class Mapping(object):
         """
         return self._args
 
+    def add_argument(self, is_static, value):
+        """ Adds an argument to the existing arguments.
+        """
+        self._args.append(Argument(is_static, value))
+
 
 class SeShell(object):
     """ Maps serial commands to shell commands.
@@ -101,7 +106,7 @@ class SeShell(object):
             for argument in arguments:
                 static = (argument.xpathEval('@type')[0].content == 'static')
                 value = argument.content
-                mapping_instance.arguments.append(Argument(static, value))
+                mapping_instance.add_argument(static, value)
             self.mappings.append(mapping_instance)
         xml_doc.freeDoc()
         xml_context.xpathFreeContext()
