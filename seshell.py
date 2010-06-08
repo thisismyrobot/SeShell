@@ -72,16 +72,6 @@ class SeShell(object):
         data = proc.stdout.readline().rstrip()
         callback(data)
 
-    @staticmethod
-    def _xml_valid(xml_doc, xml_context):
-        """ Returns True if the xml_context is valid, false otherwise.
-        """
-        dtd = libxml2.parseDTD(None, 'validxml.dtd')
-        ret = xml_doc.validateDtd(xml_context, dtd)
-        dtd.freeDtd()
-        del dtd
-        return (ret == 1)
-
     def parse(self, data):
         """ Parses argument(s) and calls commands as mapped. The matching is
             done with re.sub that replaces a match with ''. If the input data
@@ -108,7 +98,6 @@ class SeShell(object):
         xml_data = xml_file.read()
         xml_doc = libxml2.parseMemory(xml_data, len(xml_data))
         xml_context = xml_doc.xpathNewContext()
-        self._xml_valid(xml_doc, xml_context)
         mappings = xml_context.xpathEval('//mappings/mapping')
         for mapping in mappings:
             pattern = mapping.xpathEval('pattern/text()')[0]
