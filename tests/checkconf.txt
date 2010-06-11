@@ -95,3 +95,18 @@ CheckConf Error: XML in 'tests/configs/no_mappings.xml' not valid, see error(s) 
 
 >>> len(proc.stdout.read().strip())
 0
+
+Missing mapping items
+---------------------
+
+This error is thrown by the DTD validator
+
+>>> proc = subprocess.Popen(['python', 'checkconf.py', 'tests/configs/no_items.xml'],
+...                         stdout=subprocess.PIPE,
+...                         stderr=subprocess.PIPE)
+>>> print proc.stderr.read().strip()
+Element mapping content does not follow the DTD, expecting (pattern , argument+ , timeout), got ()
+CheckConf Error: XML in 'tests/configs/no_items.xml' not valid, see error(s) above.
+
+>>> len(proc.stdout.read().strip())
+0

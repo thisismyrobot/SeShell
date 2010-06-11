@@ -26,6 +26,7 @@ And some xml to parse
 ...         <argument type="static">python</argument>
 ...         <argument type="static">tests/processes/printargs.py</argument>
 ...         <argument type="dynamic">0</argument>
+...         <timeout value="1"/>
 ...     </mapping>
 ...     <mapping>
 ...         <pattern>test2 (.*),(.*)</pattern>
@@ -34,6 +35,7 @@ And some xml to parse
 ...         <argument type="dynamic">0</argument>
 ...         <argument type="dynamic">1</argument>
 ...         <argument type="static">last_argument</argument>
+...         <timeout value="1"/>
 ...     </mapping>
 ...     <mapping>
 ...         <pattern>test3 (.*),(.*)</pattern>
@@ -41,6 +43,7 @@ And some xml to parse
 ...         <argument type="static">tests/processes/slowprocess.py</argument>
 ...         <argument type="dynamic">0</argument>
 ...         <argument type="dynamic">1</argument>
+...         <timeout value="3"/>
 ...     </mapping>
 ... </mappings>
 ... """
@@ -88,7 +91,7 @@ really slow embedded systems.
 >>> int(after - now)
 0
 
->>> time.sleep(3)
+>>> time.sleep(2.1)
 delayed arguments: ['tests/processes/slowprocess.py', '34', '26']
 
 Escaped arguments
@@ -99,3 +102,38 @@ To stop arguments breaking out of the method call, they are escaped.
 >>> seshell_tool.parse("""test1 hello ; echo \"b,oo\\' "bar'""")
 >>> time.sleep(0.1)
 arguments: ['tests/processes/printargs.py', 'hello ; echo "b,oo\\\' "bar\'']
+
+Timeouts
+--------
+
+If a process takes longer than the value in the <timeout> tag, it is killed
+and no output is returned (partial output is discarded). The timeout for
+test 4 is 0.5 seconds, the program should block for 1 second, printing out
+some data immediately and some after the 1 second. 
+
+Firstly, we add the mapping
+
+>>> xml = """<?xml version="1.0" encoding="UTF-8"?>
+... <mappings>
+...     <mapping>
+...         <pattern>test4 (.*)</pattern>
+...         <argument type="static">python</argument>
+...         <argument type="static">tests/processes/timeout.py</argument>
+...         <argument type="dynamic">0</argument>
+...         <timeout value="0.5"/>
+...     </mapping>
+... </mappings>
+... """
+
+>>> xmlfile = StringIO.StringIO(xml)
+>>> seshell_tool.load(xmlfile)
+
+And check that the existing arguments have been deleted
+
+>>> seshell_tool.parse("test1 hello")
+>>> time.sleep(0.1)
+
+Now we check the new mapping
+
+>>> seshell_tool.parse("test4 hello how are you?")
+>>> time.sleep(1.1)

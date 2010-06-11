@@ -30,6 +30,7 @@ import libxml2
 import re
 import subprocess
 import threading
+import time
 
 
 class Argument(object):
@@ -55,9 +56,10 @@ class Argument(object):
 class Mapping(object):
     """ Represents a mapping between a serial command and a shell command.
     """
-    def __init__(self, pattern):
+    def __init__(self, pattern, timeout):
         self._pattern = str(pattern)
         self._args = []
+        self._timeout = float(timeout)
 
     @property
     def pattern(self):
@@ -70,6 +72,12 @@ class Mapping(object):
         """ Returns the arguments for the mapping.
         """
         return self._args
+
+    @property
+    def timeout(self):
+        """ Returns the timeout.
+        """
+        return self._timeout
 
     def add_argument(self, is_static, value):
         """ Adds an argument to the existing arguments.
@@ -88,13 +96,21 @@ class SeShell(object):
         """ Prints the data. Is used as a callback for methods to make them
             non-blocking. This will eventually fire data down a serial line.
         """
-        print data
+        print data,
 
     @staticmethod
-    def _run(args, callback):
+    def _watchdog(proc, timeout):
+        """ Kills a process if it exceedes it's maximum time.
+        """
+        time.sleep(timeout)
+        proc.kill()
+
+    def _run(self, args, timeout, callback):
         """ Launches a process and returns the resultant string.
         """
         proc = subprocess.Popen(args, stdout=subprocess.PIPE)
+        threading.Thread(target=self._watchdog,
+                         args=(proc, timeout)).start()
         data = proc.stdout.readline().rstrip()
         callback(data)
 
@@ -116,19 +132,23 @@ class SeShell(object):
                         output_args.append(input_args[input_args_index])
                         input_args_index += 1
                 threading.Thread(target=self._run,
-                                 args=(output_args, self._print)).start()
+                                 args=(output_args,
+                                       mapping.timeout,
+                                       self._print)).start()
 
     def load(self, xml_file):
         """ Parses an xml file into memory.
         """
+        self.mappings = []
         xml_data = xml_file.read()
         xml_doc = libxml2.parseMemory(xml_data, len(xml_data))
         xml_context = xml_doc.xpathNewContext()
         mappings = xml_context.xpathEval('//mappings/mapping')
         for mapping in mappings:
             pattern = mapping.xpathEval('pattern/text()')[0]
+            timeout = mapping.xpathEval('timeout/@value')[0].content
             arguments = mapping.xpathEval('argument')
-            mapping_instance = Mapping(pattern)
+            mapping_instance = Mapping(pattern, timeout)
             for argument in arguments:
                 static = (argument.xpathEval('@type')[0].content == 'static')
                 value = argument.content

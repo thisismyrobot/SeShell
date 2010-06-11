@@ -1,7 +1,11 @@
 <!ELEMENT mappings (mapping+)>
-<!ELEMENT mapping (pattern, argument+)>
+<!ELEMENT mapping (pattern, argument+, timeout)>
 <!ELEMENT pattern (#PCDATA)>
 <!ELEMENT argument (#PCDATA)>
 <!ATTLIST argument
     type    (static|dynamic)    #REQUIRED
+>
+<!ELEMENT timeout (EMPTY)>
+<!ATTLIST timeout
+    value    CDATA    #REQUIRED
 >
