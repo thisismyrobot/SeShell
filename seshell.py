@@ -147,7 +147,7 @@ class SeShell(object):
         xml_data = xml_file.read()
         xml_doc = libxml2.parseMemory(xml_data, len(xml_data))
         xml_context = xml_doc.xpathNewContext()
-        mappings = xml_context.xpathEval('//mappings/mapping')
+        mappings = xml_context.xpathEval('//seshell/mapping')
         for mapping in mappings:
             pattern = mapping.xpathEval('pattern/text()')[0]
             timeout = mapping.xpathEval('timeout/@value')[0].content

@@ -20,7 +20,7 @@ The seshell tool builds up a mapping from xml.
 And some xml to parse
 
 >>> xml = """<?xml version="1.0" encoding="UTF-8"?>
-... <mappings>
+... <seshell>
 ...     <mapping>
 ...         <pattern>test1 (.*)</pattern>
 ...         <argument type="static">python</argument>
@@ -45,7 +45,7 @@ And some xml to parse
 ...         <argument type="dynamic">1</argument>
 ...         <timeout value="3"/>
 ...     </mapping>
-... </mappings>
+... </seshell>
 ... """
 
 We can now load the xml
@@ -114,7 +114,7 @@ some data immediately and some after the 1 second.
 Firstly, we add the mapping
 
 >>> xml = """<?xml version="1.0" encoding="UTF-8"?>
-... <mappings>
+... <seshell>
 ...     <mapping>
 ...         <pattern>test4 (.*)</pattern>
 ...         <argument type="static">python</argument>
@@ -122,7 +122,7 @@ Firstly, we add the mapping
 ...         <argument type="dynamic">0</argument>
 ...         <timeout value="0.5"/>
 ...     </mapping>
-... </mappings>
+... </seshell>
 ... """
 
 >>> xmlfile = StringIO.StringIO(xml)
@@ -137,3 +137,23 @@ Now we check the new mapping
 
 >>> seshell_tool.parse("test4 hello how are you?")
 >>> time.sleep(1.1)
+
+And it returned nothing. If we change the timeout, we will get returned data.
+
+>>> xml = """<?xml version="1.0" encoding="UTF-8"?>
+... <seshell>
+...     <mapping>
+...         <pattern>test4 (.*)</pattern>
+...         <argument type="static">python</argument>
+...         <argument type="static">tests/processes/timeout.py</argument>
+...         <argument type="dynamic">0</argument>
+...         <timeout value="1.5"/>
+...     </mapping>
+... </seshell>
+... """
+
+>>> xmlfile = StringIO.StringIO(xml)
+>>> seshell_tool.load(xmlfile)
+>>> seshell_tool.parse("test4 hello how are you?")
+>>> time.sleep(1.1)
+some output before timing outthis should have timed out before showing the following: ['tests/processes/timeout.py', 'hello how are you?']

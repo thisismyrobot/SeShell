@@ -1,4 +1,4 @@
-<!ELEMENT mappings (mapping+)>
+<!ELEMENT seshell (mapping+)>
 <!ELEMENT mapping (pattern, argument+, timeout)>
 <!ELEMENT pattern (#PCDATA)>
 <!ELEMENT argument (#PCDATA)>
