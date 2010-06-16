@@ -8,4 +8,3 @@ Planned features/ideas - a very informal road-map.
    ports to find.
  * Define return strings for raised exceptions in xml.
  * Um, set up the serial listener...
- * Set up addressing for the port as prependings to the messages.
