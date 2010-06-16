@@ -15,4 +15,4 @@ tests = ("tests/README.txt", #Basic test of the core methods in SeShell
 
 for test in tests:
     doctest.testfile(test,
-        optionflags=doctest.ELLIPSIS | doctest.DONT_ACCEPT_BLANKLINE)
+        optionflags=doctest.ELLIPSIS | doctest.DONT_ACCEPT_BLANKLINE | doctest.REPORT_ONLY_FIRST_FAILURE)
