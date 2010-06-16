@@ -90,7 +90,7 @@ This error is thrown by the DTD validator
 ...                         stdout=subprocess.PIPE,
 ...                         stderr=subprocess.PIPE)
 >>> print proc.stderr.read().strip()
-Element seshell content does not follow the DTD, expecting (mapping)+, got ()
+Element seshell content does not follow the DTD, expecting (mapping | address)+, got ()
 CheckConf Error: XML in 'tests/configs/no_mappings.xml' not valid, see error(s) above.
 
 >>> len(proc.stdout.read().strip())

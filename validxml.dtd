@@ -1,11 +1,15 @@
-<!ELEMENT seshell (mapping+)>
+<!ELEMENT seshell (mapping | address)+>
+<!ELEMENT address (mapping+)>
+<!ATTLIST address
+    value    CDATA    #REQUIRED
+>
 <!ELEMENT mapping (pattern, argument+, timeout)>
 <!ELEMENT pattern (#PCDATA)>
 <!ELEMENT argument (#PCDATA)>
 <!ATTLIST argument
     type    (static|dynamic)    #REQUIRED
 >
-<!ELEMENT timeout (EMPTY)>
+<!ELEMENT timeout EMPTY>
 <!ATTLIST timeout
     value    CDATA    #REQUIRED
 >

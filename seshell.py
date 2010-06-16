@@ -118,6 +118,21 @@ class SeShell(object):
         data = proc.stdout.readline().rstrip()
         callback(data)
 
+    def _mappings(self, node, address=None):
+        """ Parses the mappings for a node.
+        """
+        pattern = node.xpathEval('pattern/text()')[0]
+        if address:
+            pattern = "%s%s" % (address, pattern)
+        timeout = node.xpathEval('timeout/@value')[0].content
+        arguments = node.xpathEval('argument')
+        mapping_instance = Mapping(pattern, timeout)
+        for argument in arguments:
+            static = (argument.xpathEval('@type')[0].content == 'static')
+            value = argument.content
+            mapping_instance.add_argument(static, value)
+        self.mappings.append(mapping_instance)
+
     def parse(self, data):
         """ Parses argument(s) and calls commands as mapped. The matching is
             done with re.sub that replaces a match with ''. If the input data
@@ -147,17 +162,18 @@ class SeShell(object):
         xml_data = xml_file.read()
         xml_doc = libxml2.parseMemory(xml_data, len(xml_data))
         xml_context = xml_doc.xpathNewContext()
+
+        addresses = xml_context.xpathEval('//seshell/address')
+        for address in addresses:
+            addresstxt = address.xpathEval('@value')[0].content
+            mappings = address.xpathEval('mapping')
+            for mapping in mappings:
+                self._mappings(mapping, addresstxt)
+
         mappings = xml_context.xpathEval('//seshell/mapping')
         for mapping in mappings:
-            pattern = mapping.xpathEval('pattern/text()')[0]
-            timeout = mapping.xpathEval('timeout/@value')[0].content
-            arguments = mapping.xpathEval('argument')
-            mapping_instance = Mapping(pattern, timeout)
-            for argument in arguments:
-                static = (argument.xpathEval('@type')[0].content == 'static')
-                value = argument.content
-                mapping_instance.add_argument(static, value)
-            self.mappings.append(mapping_instance)
+            self._mappings(mapping)
+
         xml_doc.freeDoc()
         xml_context.xpathFreeContext()
         del xml_doc

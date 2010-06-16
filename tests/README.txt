@@ -48,10 +48,15 @@ And some xml to parse
 ... </seshell>
 ... """
 
-We can now load the xml
+We can now load the xml and validate it
 
 >>> import StringIO
 >>> xmlfile = StringIO.StringIO(xml)
+>>> xmlfile.name = "test.xml"
+>>> import checkconf
+>>> checkconf.validate(xmlfile)
+>>> xmlfile = StringIO.StringIO(xml)
+>>> xmlfile.name = "test.xml"
 >>> seshell_tool.load(xmlfile)
 
 Parsing input
@@ -125,7 +130,13 @@ Firstly, we add the mapping
 ... </seshell>
 ... """
 
+>>> import StringIO
 >>> xmlfile = StringIO.StringIO(xml)
+>>> xmlfile.name = "test.xml"
+>>> import checkconf
+>>> checkconf.validate(xmlfile)
+>>> xmlfile = StringIO.StringIO(xml)
+>>> xmlfile.name = "test.xml"
 >>> seshell_tool.load(xmlfile)
 
 And check that the existing arguments have been deleted
@@ -152,8 +163,84 @@ And it returned nothing. If we change the timeout, we will get returned data.
 ... </seshell>
 ... """
 
+>>> import StringIO
 >>> xmlfile = StringIO.StringIO(xml)
+>>> xmlfile.name = "test.xml"
+>>> import checkconf
+>>> checkconf.validate(xmlfile)
+>>> xmlfile = StringIO.StringIO(xml)
+>>> xmlfile.name = "test.xml"
 >>> seshell_tool.load(xmlfile)
 >>> seshell_tool.parse("test4 hello how are you?")
 >>> time.sleep(1.1)
 some output before timing outthis should have timed out before showing the following: ['tests/processes/timeout.py', 'hello how are you?']
+
+Addressable mappings
+--------------------
+
+Some protocols are multi-drop (RS-485, RS-422 etc) where each reciever has an
+address. Some addressing schemes are simple like SDI-12 which uses the numbers
+0-9 as the first charater to indicate devices 1-10. Some RS-485 devices use
+#n as the first characters (n = device number) for addressing. When defining
+mappings the user could easily prepend all of their <pattern> elements with
+the address - eg <pattern>#1 gettemp(sensor=2)</pattern> or they could use the
+<address> tag to wrap a collection of mappings that all have the same start
+address.
+
+Firstly, we will create and load some xml.
+
+>>> xml = """<?xml version="1.0" encoding="UTF-8"?>
+... <seshell>
+...     <address value="#1">
+...         <mapping>
+...             <pattern>test5 (.*)</pattern>
+...             <argument type="static">python</argument>
+...             <argument type="static">tests/processes/printargs.py</argument>
+...             <argument type="dynamic">0</argument>
+...             <timeout value="0.1"/>
+...         </mapping>
+...         <mapping>
+...             <pattern>test6 (.*)</pattern>
+...             <argument type="static">python</argument>
+...             <argument type="static">tests/processes/printargs.py</argument>
+...             <argument type="dynamic">0</argument>
+...             <timeout value="0.1"/>
+...         </mapping>
+...     </address>
+...     <address value="#2">
+...         <mapping>
+...             <pattern>test7 (.*)</pattern>
+...             <argument type="static">python</argument>
+...             <argument type="static">tests/processes/printargs.py</argument>
+...             <argument type="dynamic">0</argument>
+...             <timeout value="0.1"/>
+...         </mapping>
+...     </address>
+... </seshell>
+... """
+
+>>> import StringIO
+>>> xmlfile = StringIO.StringIO(xml)
+>>> xmlfile.name = "test.xml"
+>>> import checkconf
+>>> checkconf.validate(xmlfile)
+>>> xmlfile = StringIO.StringIO(xml)
+>>> xmlfile.name = "test.xml"
+>>> seshell_tool.load(xmlfile)
+
+Now we can trigger the different patterns using their addresses.
+
+>>> seshell_tool.parse("test5 no address means no output")
+>>> time.sleep(0.1)
+
+>>> seshell_tool.parse("#1test5 adding the address generates some output")
+>>> time.sleep(0.1)
+arguments: ['tests/processes/printargs.py', 'adding the address generates some output']
+
+>>> seshell_tool.parse("#1test6 and multiple mappings can be mapped together")
+>>> time.sleep(0.1)
+arguments: ['tests/processes/printargs.py', 'and multiple mappings can be mapped together']
+
+>>> seshell_tool.parse("#2test7 and we can add multiple addresses per file")
+>>> time.sleep(0.1)
+arguments: ['tests/processes/printargs.py', 'and we can add multiple addresses per file']
