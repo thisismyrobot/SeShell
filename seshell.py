@@ -106,7 +106,11 @@ class SeShell(object):
         proc.kill()
 
     def _run(self, args, timeout, callback):
-        """ Launches a process and returns the resultant string.
+        """ Launches a process and returns the resultant string. The creation
+            of the process is non-blocking, but the readline() is blocking. To
+            resolve possible hangs when a process fails to return any data,
+            between the creation of the process and readline() a thread is
+            started that kills the process after a timeout.
         """
         proc = subprocess.Popen(args, stdout=subprocess.PIPE)
         threading.Thread(target=self._watchdog,
